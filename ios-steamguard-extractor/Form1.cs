@@ -91,7 +91,8 @@ namespace ios_steamguard_extractor
                                 ServerTime = sglist[22].ToString(),
                                 AccountName = sglist[23].ToString(),
                                 SteamguardScheme = sglist[24].ToString(),
-                                Status = sglist[25].ToString()
+                                Status = sglist[25].ToString(),
+                                DeviceID = $"android:{name}"
                             };
                             txtResults.AppendText(Environment.NewLine);
 
@@ -107,6 +108,11 @@ namespace ios_steamguard_extractor
 
                             txtResults.AppendText(JsonConvert.SerializeObject(auth, Formatting.Indented) +
                                                   Environment.NewLine + Environment.NewLine);
+
+                            txtResults.AppendText(
+                                "Alternatively, you can paste the above json text into {botname}.maFile in your ASF config directory, if you use ASF"
+                                + Environment.NewLine + Environment.NewLine);
+
                         }
                         catch (PropertyListFormatException) //The only way this should happen is if we opened an encrypted backup.
                         {
@@ -168,5 +174,8 @@ namespace ios_steamguard_extractor
 
         [JsonProperty("status")]
         public string Status { get; set; }
+
+        [JsonProperty("device_id")]
+        public string DeviceID { get; set; }
 }
 }
