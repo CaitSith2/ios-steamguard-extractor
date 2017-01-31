@@ -51,7 +51,16 @@ namespace ios_steamguard_extractor
                 var name = new DirectoryInfo(d).Name;
                 if (!File.Exists(Path.Combine(d, "Manifest.mbdb")))
                 {
-                    txtResults.AppendText($"Directory {name} is not a valid ios backup, skipping" + Environment.NewLine + Environment.NewLine);
+                    txtResults.AppendText($"Directory {name} is possibly not a valid ios backup." + Environment.NewLine +
+                        "Listing contents of this directory.  Please open an issue and paste this listing" + Environment.NewLine + Environment.NewLine);
+                    foreach (var f in Directory.GetFiles(d))
+                    {
+                        var filename = Path.GetFileName(f);
+                        if (filename.Length == 20 && !filename.Contains(".")) continue; //SHA1 hash of filenames.
+                        txtResults.AppendText($"{filename}" + Environment.NewLine);
+                    }
+                    txtResults.AppendText(Environment.NewLine + "Done listing files" + Environment.NewLine +
+                                          Environment.NewLine);
                     continue;
                 }
                 txtResults.AppendText($"Processing Directory {name}" + Environment.NewLine);
