@@ -43,7 +43,7 @@ namespace ios_steamguard_extractor
                                 "Apple Computer", "MobileSync", "Backup");
             if (!Directory.Exists(iosBackups))
             {
-                txtResults.Text = "No ios backups found";
+                txtResults.Text = @"No ios backups found";
                 return;
             }
             foreach (var d in Directory.GetDirectories(iosBackups))
