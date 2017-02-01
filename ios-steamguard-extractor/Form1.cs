@@ -150,6 +150,7 @@ namespace ios_steamguard_extractor
                 }
                 dbConnection.Close();
             }
+            catch (SQLiteException)
             {
                 txtResults.AppendText("Error: Encrypted backups are not supported. You need to create a decrypted backup to proceed." + Environment.NewLine);
             }
