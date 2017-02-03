@@ -97,8 +97,8 @@ namespace ios_steamguard_extractor
 
         private void ProcessIOS9Backup(string d)
         {
-            var name = new DirectoryInfo(d).Name;
-            txtResults.AppendText($"Processing Directory {name}" + Environment.NewLine);
+            var guid = ProcessInfoPlist(d);
+            if (guid == null) return;
             var data = File.ReadAllBytes(Path.Combine(d, "Manifest.mbdb"));
             var steamfiles = Encoding.UTF8.GetBytes("AppDomain-com.valvesoftware.Steam");
             for (var index = 0; ; index += steamfiles.Length)
@@ -117,7 +117,7 @@ namespace ios_steamguard_extractor
                 var hashstr = BitConverter.ToString(hash).Replace("-", "");
                 if (File.Exists(Path.Combine(d, hashstr)))
                 {
-                    if (!ProcessSteamGuardFile(steamfilename, Path.Combine(d, hashstr), name))
+                    if (!ProcessSteamGuardFile(steamfilename, Path.Combine(d, hashstr), guid))
                         break;
                 }
                 else
@@ -130,10 +130,10 @@ namespace ios_steamguard_extractor
 
         private void ProcessIOS10Backup(string d)
         {
-            var name = new DirectoryInfo(d).Name;
             try
             {
-                txtResults.AppendText($"Processing Directory {name}" + Environment.NewLine);
+                var guid = ProcessInfoPlist(d);
+                if (guid == null) return;
                 var dbConnection = new SQLiteConnection($"Data Source=\"{Path.Combine(d, "Manifest.db")}\";Version=3;");
                 dbConnection.Open();
                 var query =
@@ -142,10 +142,9 @@ namespace ios_steamguard_extractor
                 var dbReader = dbCommand.ExecuteReader();
                 while (dbReader.Read())
                 {
-                    txtResults.AppendText("Filename: " + dbReader["relativePath"] + "\tFile ID: " + dbReader["fileID"]);
                     var startID = dbReader["fileID"].ToString().Substring(0, 2);
                     var result = ProcessSteamGuardFile(dbReader["relativePath"].ToString(),
-                        Path.Combine(d, startID, dbReader["fileID"].ToString()), name);
+                        Path.Combine(d, startID, dbReader["fileID"].ToString()), guid);
                     if (!result) break;
                 }
                 dbConnection.Close();
@@ -157,6 +156,21 @@ namespace ios_steamguard_extractor
             catch (Exception ex)
             {
                 txtResults.AppendText($"An Exception occurred while processing: {ex.Message}");
+            }
+        }
+
+        private string ProcessInfoPlist(string d)
+        {
+            try
+            {
+                var info = (NSDictionary) PropertyListParser.Parse(Path.Combine(d, "Info.plist"));
+                txtResults.AppendText($"Processing backup: {info["Device Name"]} version {info["Product Version"]}" + Environment.NewLine);
+                return info["Unique Identifier"].ToString();
+            }
+            catch (Exception ex)
+            {
+                txtResults.AppendText($"An Exception occurred while processing: {ex.Message}");
+                return null;
             }
         }
 
