@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SQLite;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Claunia.PropertyList;
 using Newtonsoft.Json;
@@ -23,10 +18,10 @@ namespace ios_steamguard_extractor
             InitializeComponent();
         }
 
-        static int SearchBytes(byte[] haystack, byte[] needle, int start)
+        private static int SearchBytes(IReadOnlyList<byte> haystack, IReadOnlyList<byte> needle, int start)
         {
-            var len = needle.Length;
-            var limit = haystack.Length - len;
+            var len = needle.Count;
+            var limit = haystack.Count - len;
             for (var i = start; i <= limit; i++)
             {
                 var k = 0;
@@ -197,7 +192,10 @@ namespace ios_steamguard_extractor
                     var count = 0;
                     foreach (var f in Directory.GetFiles(d))
                     {
-                        var filename = Path.GetFileName(f).ToLower();
+                        var fileName = Path.GetFileName(f);
+                        if (fileName == null) continue;
+
+                        var filename = fileName.ToLower();
 
                         if (filename.Length == 40)
                         {
@@ -210,7 +208,7 @@ namespace ios_steamguard_extractor
                                 continue;
                             }
                         }
-                        filename = Path.GetFileName(f);
+                        filename = fileName;
                         txtResults.AppendText($"{filename}" + Environment.NewLine);
                     }
                     txtResults.AppendText(Environment.NewLine + $"Done listing files - Skipped {count} files" + Environment.NewLine +
@@ -222,46 +220,4 @@ namespace ios_steamguard_extractor
             }
         }
     }
-
-    public class SteamAuthenticator
-    {
-        [JsonProperty("shared_secret")]
-        public string SharedSecret { get; set; }
-
-        [JsonProperty("uri")]
-        public string Uri { get; set; }
-
-        [JsonProperty("steamid")]
-        public string Steamid { get; set; }
-
-        [JsonProperty("revocation_code")]
-        public string RevocationCode { get; set; }
-
-        [JsonProperty("serial_number")]
-        public string SerialNumber { get; set; }
-
-        [JsonProperty("token_gid")]
-        public string TokenGid { get; set; }
-
-        [JsonProperty("identity_secret")]
-        public string IdentitySecret { get; set; }
-
-        [JsonProperty("secret_1")]
-        public string Secret { get; set; }
-
-        [JsonProperty("server_time")]
-        public string ServerTime { get; set; }
-
-        [JsonProperty("account_name")]
-        public string AccountName { get; set; }
-
-        [JsonProperty("steamguard_scheme")]
-        public string SteamguardScheme { get; set; }
-
-        [JsonProperty("status")]
-        public string Status { get; set; }
-
-        [JsonProperty("device_id")]
-        public string DeviceID { get; set; }
-}
 }
