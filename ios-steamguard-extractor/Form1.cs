@@ -43,20 +43,52 @@ namespace ios_steamguard_extractor
                 var sglist = ((NSArray)((NSDictionary)sgdata)["$objects"]).GetArray();
                 var auth = new SteamAuthenticator()
                 {
-                    SharedSecret = sglist[14].ToString(),
-                    Uri = sglist[15].ToString(),
-                    Steamid = sglist[16].ToString(),
-                    RevocationCode = sglist[17].ToString(),
-                    SerialNumber = sglist[18].ToString(),
-                    TokenGid = sglist[19].ToString(),
-                    IdentitySecret = sglist[20].ToString(),
-                    Secret = sglist[21].ToString(),
-                    ServerTime = sglist[22].ToString(),
-                    AccountName = sglist[23].ToString(),
-                    SteamguardScheme = sglist[24].ToString(),
-                    Status = sglist[25].ToString(),
                     DeviceID = $"android:{deviceID}"
                 };
+
+                for (var i = 2; i < 14; i++)
+                {
+                    switch (sglist[i].ToString())
+                    {
+                        case "shared_secret":
+                            auth.SharedSecret = sglist[i + 12].ToString();
+                            break;
+                        case "uri":
+                            auth.Uri = sglist[i + 12].ToString();
+                            break;
+                        case "steamid":
+                            auth.Steamid = sglist[i + 12].ToString();
+                            break;
+                        case "revocation_code":
+                            auth.RevocationCode = sglist[i + 12].ToString();
+                            break;
+                        case "serial_number":
+                            auth.SerialNumber = sglist[i + 12].ToString();
+                            break;
+                        case "token_gid":
+                            auth.TokenGid = sglist[i + 12].ToString();
+                            break;
+                        case "identity_secret":
+                            auth.IdentitySecret = sglist[i + 12].ToString();
+                            break;
+                        case "secret_1":
+                            auth.Secret = sglist[i + 12].ToString();
+                            break;
+                        case "server_time":
+                            auth.ServerTime = sglist[i + 12].ToString();
+                            break;
+                        case "account_name":
+                            auth.AccountName = sglist[i + 12].ToString();
+                            break;
+                        case "steamguard_scheme":
+                            auth.SteamguardScheme = sglist[i + 12].ToString();
+                            break;
+                        case "status":
+                            auth.Status = sglist[i + 12].ToString();
+                            break;
+                    }
+                }
+
                 txtResults.AppendText(Environment.NewLine);
 
                 txtResults.AppendText("In WinAuth, Add Steam Authenticator. Select the Import Android Tab" +
